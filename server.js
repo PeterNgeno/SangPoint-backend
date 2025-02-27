@@ -4,7 +4,13 @@ const cors = require('cors');
 const path = require('path');
 const admin = require('firebase-admin');
 
-// Firebase service account setup using environment variables
+// Validate required environment variables
+if (!process.env.FIREBASE_PROJECT_ID || !process.env.FIREBASE_PRIVATE_KEY || !process.env.FIREBASE_CLIENT_EMAIL) {
+  console.error("❌ Missing Firebase credentials in environment variables.");
+  process.exit(1);
+}
+
+// Firebase service account setup
 const serviceAccount = {
   type: "service_account",
   project_id: process.env.FIREBASE_PROJECT_ID,
@@ -19,10 +25,16 @@ const serviceAccount = {
 };
 
 // Initialize Firebase Admin SDK
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL: process.env.FIREBASE_DATABASE_URL || "https://perontipsltd.firebaseio.com", // Use environment variable if set
-});
+try {
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: process.env.FIREBASE_DATABASE_URL || "https://perontipsltd.firebaseio.com",
+  });
+  console.log("✅ Firebase initialized successfully.");
+} catch (error) {
+  console.error("❌ Firebase initialization error:", error);
+  process.exit(1);
+}
 
 // Import middleware, controllers, and routes
 const { logQuizAttempt } = require('./middleware/analytics');
@@ -151,5 +163,5 @@ app.use((err, req, res, next) => {
 // Start the Server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`🚀 Server is running on port ${PORT}`);
 });
