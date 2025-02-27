@@ -6,6 +6,7 @@ node_modules/
 
 # Ignore Firebase Service Account JSON
 firebase-adminsdk-*.json
+service-account.json  # Add this line
 
 # Ignore logs
 *.log
